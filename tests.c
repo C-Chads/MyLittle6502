@@ -1588,14 +1588,14 @@ int run_tests(test_t tests[]) {
 
 int main(int argc, char **argv) {
 	(void)argc;
+	(void)argv;
     run_tests(normal_tests);
+    run_tests(nmos_tests);
     /*
     if(argc > 1)
     	if (!strcmp(argv[1], "cmos"))
         	run_tests(cmos_tests);
     */
-    if(argc > 1)
-    	if (!strcmp(argv[1], "nmos"))
-        	run_tests(nmos_tests);
+        	
     return EXIT_SUCCESS;
 }
