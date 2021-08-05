@@ -518,7 +518,7 @@ int decimal_mode() {
 
     exec_instruction(0xe9, 0x01, 0x00); // SBC #$01
     CHECK(pc, 0x207);
-    CHECK(a, 0x98); /*The carry bit is not set, so a subtraction should take us down to 98!*/
+    CHECK(a, 0x98); /*The carry bit is not set, so a subtraction should take us down to 98! However, the carry bit *will* be set after this.*/
 
     exec_instruction(0xe9, 0x10, 0x00); // SBC #$10
     CHECK(pc, 0x209);

@@ -776,9 +776,6 @@ static void sbc() {
     signcalc(result);
 
 #ifndef NES_CPU
-/*
-	BUGGED!
-*/
     if (status & FLAG_DECIMAL) {
         clearcarry();
         /*result -= 0x66;*/
