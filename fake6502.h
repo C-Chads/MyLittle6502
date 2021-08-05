@@ -274,7 +274,7 @@ void reset6502() {
 
 static void (*addrtable[256])();
 static void (*optable[256])();
-uint8 penaltyop, penaltyaddr;
+static uint8 penaltyop, penaltyaddr;
 
 /*addressing mode functions, calculates effective addresses*/
 static void imp() { 
