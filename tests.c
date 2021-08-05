@@ -515,15 +515,36 @@ int decimal_mode() {
 
     exec_instruction(0x18, 0x00, 0x00); // CLC
     CHECK(pc, 0x205);
+    CHECKFLAG(FLAG_CARRY, 0);
 
     exec_instruction(0xe9, 0x01, 0x00); // SBC #$01
     CHECK(pc, 0x207);
     CHECK(a, 0x98); /*The carry bit is not set, so a subtraction should take us down to 98! However, the carry bit *will* be set after this.*/
 
+	/*This instruction starts with the carry bit set.*/
     exec_instruction(0xe9, 0x10, 0x00); // SBC #$10
     CHECK(pc, 0x209);
-    CHECK(a, 0x88);
+    CHECK(a, 0x88); /*this is the result.*/
+    CHECKFLAG(FLAG_CARRY, 0); /*The carry bit should be 0.*/
 
+    exec_instruction(0x38, 0x00, 0x00); /* SEC*/
+    CHECK(pc, 0x20A);
+	CHECKFLAG(FLAG_CARRY, 1); /*The carry bit should be 1.*/
+	
+    exec_instruction(0xe9, 0x04, 0x00); /* SBC #$4*/
+    CHECK(pc, 0x20C);
+    CHECK(a, 0x84);
+	CHECKFLAG(FLAG_CARRY, 0); 
+	/*the carry bit is not set so it will subtract 5 even though we tell it o sub 4.*/
+    exec_instruction(0xe9, 0x04, 0x00); // SBC #$4
+    CHECK(pc, 0x20E);
+    CHECK(a, 0x79);
+	CHECKFLAG(FLAG_CARRY, 0); 
+	/*the carry bit is not set so it will subtract 3 instead of just two.*/
+    exec_instruction(0xe9, 0x02, 0x00); // SBC #$2
+    CHECK(pc, 0x210);
+    CHECK(a, 0x76);
+    
     return 0;
 }
 
