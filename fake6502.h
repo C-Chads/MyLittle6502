@@ -89,11 +89,11 @@
  * void reset6502()                                  *
  *   - Call this once before you begin execution.    *
  *                                                   *
- * void exec6502(uint32 tickcount)                 *
+ * uint32 exec6502(uint32 tickcount)                 *
  *   - Execute 6502 code up to the next specified    *
  *     count of clock ticks.                         *
  *                                                   *
- * void step6502()                                   *
+ * uint32 step6502()                                   *
  *   - Execute a single instrution.                  *
  *                                                   *
  * void irq6502()                                    *
@@ -111,10 +111,10 @@
  *****************************************************
  * Useful variables in this emulator:                *
  *                                                   *
- * uint32 clockticks6502                           *
- *   - A running total of the emulated cycle count.  *
- *                                                   *
- * uint32 instructions                             *
+ * uint32 clockticks6502                             *
+ *   - A running total of the emulated cycle count   *
+ *     during a call to exec6502.                    *
+ * uint32 instructions                               *
  *   - A running total of the total emulated         *
  *     instruction count. This is not related to     *
  *     clock cycle timing.                           *
@@ -223,7 +223,7 @@ uint8 sp, a, x, y, status;
 /*helper variables*/
 uint32 instructions = 0; 
 uint32 clockticks6502 = 0;
-signed long clockgoal6502 = 0; /*Made a signed number.*/
+uint32 clockgoal6502 = 0; /*Made a signed number.*/
 ushort oldpc, ea, reladdr, value, result;
 uint8 opcode, oldstatus;
 #else
@@ -231,7 +231,7 @@ static ushort pc;
 static uint8 sp, a, x, y, status;
 static uint32 instructions = 0; 
 static uint32 clockticks6502 = 0;
-static signed long clockgoal6502 = 0; 
+static uint32 clockgoal6502 = 0; 
 static ushort oldpc, ea, reladdr, value, result;
 static uint8 opcode, oldstatus;
 #endif
@@ -1019,14 +1019,16 @@ void irq6502() {
 uint8 callexternal = 0;
 void (*loopexternal)();
 
-void exec6502(uint32 tickcount) {
+uint32 exec6502(uint32 tickcount) {
 	/*
 		BUG FIX:
 		overflow of unsigned 32 bit integer causes emulation to hang.
-		An instruction might cause the tick count to wrap around into the billions,
-		I changed it to be a signed number.
+		An instruction might cause the tick count to wrap around into the billions.
+
+		The system is changed so that now clockticks 6502 is reset every single time that exec is called.
 	*/
     clockgoal6502 = tickcount;
+    clockticks6502 = 0;
     while (clockgoal6502 > 0) { /*clockgoal was changed to a signed long, so it should never wrap around to zero.*/
         opcode = read6502(pc++);
         status |= FLAG_CONSTANT;
@@ -1035,21 +1037,20 @@ void exec6502(uint32 tickcount) {
        	(*addrtable[opcode])();
         (*optable[opcode])();
         clockticks6502 += ticktable[opcode];
-        clockgoal6502 -= ticktable[opcode];
-        if (penaltyop && penaltyaddr) {clockticks6502++;clockgoal6502--;}
+        if (penaltyop && penaltyaddr) {clockticks6502++;}
         instructions++;
         if (callexternal) (*loopexternal)();
     }
-
+	return clockticks6502;
 }
 
-void step6502() {
+uint32 step6502() {
     opcode = read6502(pc++);
     status |= FLAG_CONSTANT;
 
     penaltyop = 0;
     penaltyaddr = 0;
-
+	clockticks6502 = 0;
     (*addrtable[opcode])();
     (*optable[opcode])();
     clockticks6502 += ticktable[opcode];
@@ -1060,6 +1061,7 @@ void step6502() {
     instructions++;
 
     if (callexternal) (*loopexternal)();
+    return clockticks6502;
 }
 
 void hookexternal(void *funcptr) {

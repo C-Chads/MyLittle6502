@@ -412,7 +412,6 @@ void exec_instruction(uint8 opcode, uint8 op1,
 
     clockticks6502 = reads = writes = 0;
     step6502();
-    /*exec6502(1);*/
 }
 
 int interrupt() {
