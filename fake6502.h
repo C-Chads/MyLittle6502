@@ -121,6 +121,19 @@
  *                                                   *
  *****************************************************/
 
+
+/*
+	6510 EMULATION NOTES:
+	1) On the 6510 processor, the only difference is that the addresses 0 and 1 are used
+	for data direction and data, respectively.
+
+	2) The initial value of address 0 should always be 0.
+
+	3) Read this page
+	https://ist.uwaterloo.ca/~schepers/MJK/6510.html
+
+*/
+
 #include <stdio.h>
 #ifdef FAKE6502_USE_STDINT
 #include <stdint.h>
