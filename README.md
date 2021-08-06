@@ -32,20 +32,28 @@ did not break anything.
 I used these references for opcodes and what they do:
 
 [6502.org's opcodes list](http://6502.org/tutorials/6502opcodes.html)
+
 [obelisk.me.uk's 6502 reference](http://www.obelisk.me.uk/6502/reference.html)
+
 [This one I found on google sites](https://sites.google.com/site/6502asembly/6502-instruction-set)
 
-Commodore basic v2 boots and can run prints and write programs. 
-If you break the emulator with a fix, then you'll typically get a SYNTAX ERROR
-from every command, and hitting enter without any text will hang the emulator.
+Commodore basic v2 boots and BASIC works just as expected. For loops, prints, math, all work as expected.
+
+All other 6502 based systems I tested also work, although kernalemu only implements a few of them completely.
+
+For instance, many commands in the C128 kernalemu implementation are completely dead due to being stubbed out with NYI()
+
+(Not Yet Implemented) calls.
 
 I have yet to verify that this emulator works with MOARNES, mike chamber's NES emulator.
 However, given that the NES's 6502 variant does not use decimal mode, I would guess
 that it would still work just fine.
 
-Moarnes can be found on github ![here](https://github.com/darlanalves/moarnes) 
+If you find any errors feel free to post an issue or make a PR.
 
-or on sourceforge, ![here](https://sourceforge.net/projects/moarnes/)
+Moarnes can be found on github [here](https://github.com/darlanalves/moarnes) 
+
+or on sourceforge, [here](https://sourceforge.net/projects/moarnes/)
 
 The latter is supposedly "more official"
 
