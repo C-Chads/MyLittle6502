@@ -222,14 +222,16 @@ ushort pc;
 uint8 sp, a, x, y, status;
 /*helper variables*/
 uint32 instructions = 0; 
-uint32 clockticks6502 = 0, clockgoal6502 = 0;
+uint32 clockticks6502 = 0;
+signed long clockgoal6502 = 0; /*Made a signed number.*/
 ushort oldpc, ea, reladdr, value, result;
 uint8 opcode, oldstatus;
 #else
 static ushort pc;
 static uint8 sp, a, x, y, status;
 static uint32 instructions = 0; 
-static uint32 clockticks6502 = 0, clockgoal6502 = 0;
+static uint32 clockticks6502 = 0;
+static signed long clockgoal6502 = 0; 
 static ushort oldpc, ea, reladdr, value, result;
 static uint8 opcode, oldstatus;
 #endif
@@ -1018,8 +1020,14 @@ uint8 callexternal = 0;
 void (*loopexternal)();
 
 void exec6502(uint32 tickcount) {
-    clockgoal6502 += tickcount;
-    while (clockticks6502 < clockgoal6502) {
+	/*
+		BUG FIX:
+		overflow of unsigned 32 bit integer causes emulation to hang.
+		An instruction might cause the tick count to wrap around into the billions,
+		I changed it to be a signed number.
+	*/
+    clockgoal6502 = tickcount;
+    while (clockgoal6502 > 0) { /*clockgoal was changed to a signed long, so it should never wrap around to zero.*/
         opcode = read6502(pc++);
         status |= FLAG_CONSTANT;
         penaltyop = 0;
@@ -1027,7 +1035,8 @@ void exec6502(uint32 tickcount) {
        	(*addrtable[opcode])();
         (*optable[opcode])();
         clockticks6502 += ticktable[opcode];
-        if (penaltyop && penaltyaddr) clockticks6502++;
+        clockgoal6502 -= ticktable[opcode];
+        if (penaltyop && penaltyaddr) {clockticks6502++;clockgoal6502--;}
         instructions++;
         if (callexternal) (*loopexternal)();
     }
@@ -1046,7 +1055,7 @@ void step6502() {
     clockticks6502 += ticktable[opcode];
     /*The following line goes commented out in Mike Chamber's usage of the 6502 emulator for MOARNES*/
     if (penaltyop && penaltyaddr) clockticks6502++;
-    clockgoal6502 = clockticks6502;
+    /*clockgoal6502 = clockticks6502; irrelevant.*/ 
 
     instructions++;
 
