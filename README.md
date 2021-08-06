@@ -4,6 +4,14 @@ Mike Chambers' Fake6502 with revamped bug fixes for decimal mode, along with a f
 
 The header file in this repository is in the public domain. tests.c is not. Do not put it in a public domain project.
 
+# CHANGELOG
+
+* Fixed interrupt masking.
+* Fixed decimal mode adc and sbc
+* Fixed exec6502 possibly executing many billions more instructions than desired.
+* Fixed documentation
+
+
 
 The emulator uses global state and there is no "instancing" it.
 
@@ -77,7 +85,8 @@ ushort pc;
 uint8 sp, a, x, y, status;
 /*helper variables*/
 uint32 instructions = 0; 
-uint32 clockticks6502 = 0, clockgoal6502 = 0;
+uint32 clockticks6502 = 0;
+signed long clockgoal6502 = 0; /*Made a signed number.*/
 ushort oldpc, ea, reladdr, value, result;
 uint8 opcode, oldstatus;
 ```
