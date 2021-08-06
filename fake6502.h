@@ -1009,7 +1009,8 @@ void irq6502() {
 		push_6502_16(pc);
 		push_6502_8(status & ~FLAG_BREAK);
 		status |= FLAG_INTERRUPT;
-		pc = mem_6502_read16(0xfffe);
+		/*pc = mem_6502_read16(0xfffe);*/
+		pc = (ushort)read6502(0xFFFE) | ((ushort)read6502(0xFFFF) << 8);
 	}
 }
 
