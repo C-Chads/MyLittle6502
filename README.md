@@ -25,9 +25,15 @@ you can additionally define a "hook" to be executed after every instruction.
 
 
 
-I used ![this](https://github.com/omarandlorraine/fake6502) instruction exerciser along with 
-![this](https://github.com/mist64/kernalemu) C64 kernal emulator to verify that my fixes were correct and
+I used [this](https://github.com/omarandlorraine/fake6502) instruction exerciser along with 
+[this](https://github.com/mist64/kernalemu) C64 kernal emulator to verify that my fixes were correct and
 did not break anything.
+
+I used these references for opcodes and what they do:
+
+[6502.org's opcodes list](http://6502.org/tutorials/6502opcodes.html)
+[obelisk.me.uk's 6502 reference](http://www.obelisk.me.uk/6502/reference.html)
+[This one I found on google sites](https://sites.google.com/site/6502asembly/6502-instruction-set)
 
 Commodore basic v2 boots and can run prints and write programs. 
 If you break the emulator with a fix, then you'll typically get a SYNTAX ERROR
