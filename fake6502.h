@@ -169,6 +169,7 @@ typedef unsigned int uint32;
 #define FLAG_ZERO      0x02
 #define FLAG_INTERRUPT 0x04
 #define FLAG_DECIMAL   0x08
+/*bits 4 and 5.*/
 #define FLAG_BREAK     0x10
 #define FLAG_CONSTANT  0x20
 #define FLAG_OVERFLOW  0x40
@@ -995,7 +996,7 @@ static const uint32 ticktable[256] = {
 
 void nmi6502() {
     push_6502_16(pc);
-    push_6502_8(status);
+    push_6502_8(status  & ~FLAG_BREAK);
     status |= FLAG_INTERRUPT;
     pc = (ushort)read6502(0xFFFA) | ((ushort)read6502(0xFFFB) << 8);
 }
