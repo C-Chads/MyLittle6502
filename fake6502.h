@@ -1029,7 +1029,7 @@ uint32 exec6502(uint32 tickcount) {
 	*/
     clockgoal6502 = tickcount;
     clockticks6502 = 0;
-    while (clockgoal6502 > 0) { /*clockgoal was changed to a signed long, so it should never wrap around to zero.*/
+    while (clockticks6502 < clockgoal6502) {
         opcode = read6502(pc++);
         status |= FLAG_CONSTANT;
         penaltyop = 0;
