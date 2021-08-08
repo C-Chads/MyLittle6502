@@ -808,7 +808,7 @@ static void sbc() {
         }
 		zerocalc(result);                /* CMOS change, Decimal Arithmetic sets NZV */
         signcalc(result);
-        /*TODO: overflow calculation.*/
+        /*? I believe this is correct.*/
         overflowcalc(result, a, value);
         clockticks6502++;
     } else {

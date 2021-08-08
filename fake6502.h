@@ -416,6 +416,7 @@ static void adc() {
             result += 0x60;
             setcarry();
         }
+        overflowcalc(result, a, value); /*Overflow calculation emulation.*/
         clockticks6502++;
     }
 #endif
@@ -795,6 +796,7 @@ static void sbc() {
             result -= 0x60;
             setcarry();
         }
+        overflowcalc(result, a, value); /*Overflow value calculation.*/
         clockticks6502++;
     }
 #endif
