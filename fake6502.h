@@ -397,42 +397,28 @@ static void putvalue(ushort saveval) {
 
 /*instruction handler functions*/
 static void adc() {
-penaltyop = 1;
+    penaltyop = 1;
+    value = getvalue();
+    result = (ushort)a + value + (ushort)(status & FLAG_CARRY);
+   
+    carrycalc(result);
+    zerocalc(result);
+    overflowcalc(result, a, value);
+    signcalc(result);
     
 #ifndef NES_CPU
     if (status & FLAG_DECIMAL) {
-        ushort tmp, tmp2;
-        
-        value = getvalue();
-        tmp = ((ushort)a & 0x0F) + (value & 0x0F) + (ushort)(status & FLAG_CARRY);
-        tmp2 = ((ushort)a & 0xF0) + (value & 0xF0);
-        if (tmp > 0x09) {
-            tmp2 += 0x10;
-            tmp += 0x06;
+        clearcarry();
+        if ((result & 0x0F) > 0x09) {
+            result += 0x06;
         }
-        if (tmp2 > 0x90) {
-            tmp2 += 0x60;
-        }
-        if (tmp2 & 0xFF00) {
+        if ((result & 0xF0) > 0x90) {
+            result += 0x60;
             setcarry();
-        } else {
-            clearcarry();
         }
-        result = (tmp & 0x0F) | (tmp2 & 0xF0);
-        /*the original 6502 did not set the zero flag for the */
-        signcalc(result);
-        /*clockticks6502++;*/
-    } else 
-#endif
-	{
-	    value = getvalue();
-	    result = (ushort)a + value + (ushort)(status & FLAG_CARRY);
-	   
-	    carrycalc(result);
-	    zerocalc(result);
-	    overflowcalc(result, a, value);
-	    signcalc(result);
+        clockticks6502++;
     }
+#endif
    
     saveaccum(result);
 }
@@ -523,9 +509,9 @@ static void bpl() {
 
 static void brk_6502() {
     pc++;
-    push_6502_16(pc); /*push next instruction address onto stack*/
-    push_6502_8(status | FLAG_BREAK); /*push CPU status to stack*/
-    setinterrupt(); /*set interrupt flag*/
+    push_6502_16(pc); 
+    push_6502_8(status | FLAG_BREAK); 
+    setinterrupt();
     pc = (ushort)read6502(0xFFFE) | ((ushort)read6502(0xFFFF) << 8);
 }
 
@@ -782,11 +768,24 @@ static void rts() {
 }
 
 static void sbc() {
+/*
+	3a. AL = (A & $0F) - (B & $0F) + C-1
+	3b. If AL < 0, then AL = ((AL - $06) & $0F) - $10
+	3c. A = (A & $F0) - (B & $F0) + AL
+	3d. If A < 0, then A = A - $60
+	3e. The accumulator result is the lower 8 bits of A
+*/
     penaltyop = 1;
+    value = getvalue() ^ 0x00FF;
+    result = (ushort)a + value + (ushort)(status & FLAG_CARRY);
+   
+    carrycalc(result);
+    zerocalc(result);
+    overflowcalc(result, a, value);
+    signcalc(result);
+
 #ifndef NES_CPU
     if (status & FLAG_DECIMAL) {
-     	value = getvalue() ^ 0x00FF;
-    	result = (ushort)a + value + (ushort)(status & FLAG_CARRY);
         clearcarry();
         /*result -= 0x66;*/
         if ((result & 0x0F) > 0x09) {
@@ -796,19 +795,10 @@ static void sbc() {
             result -= 0x60;
             setcarry();
         }
-        signcalc(result);
-        /*clockticks6502++;*/
-    } else 
-#endif
-	{
-        value = getvalue() ^ 0x00FF;
-        result = (ushort)a + value + (ushort)(status & FLAG_CARRY);
-        
-        carrycalc(result);
-        zerocalc(result);
-        overflowcalc(result, a, value);
-        signcalc(result);
+        clockticks6502++;
     }
+#endif
+   
     saveaccum(result);
 }
 

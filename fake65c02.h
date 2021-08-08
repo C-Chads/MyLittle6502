@@ -423,10 +423,10 @@ static void adc() {
             clearcarry();
         }
         result = (tmp & 0x0F) | (tmp2 & 0xF0);
-
+		
         zerocalc(result);                /* 65C02 change, Decimal Arithmetic sets NZV */
         signcalc(result);
-
+		/*TODO: emulate overflow calculation.*/
         clockticks6502++;
     } else {
         value = getvalue();
@@ -526,10 +526,10 @@ static void bpl() {
 
 static void brk_6502() {
     pc++;
-    push_6502_16(pc); /*push next instruction address onto stack*/
-    push_6502_8(status | FLAG_BREAK); /*push CPU status to stack*/
-    setinterrupt(); /*set interrupt flag*/
-    cleardecimal(); /*CMOS clears the decimal flag.*/
+    push_6502_16(pc);
+    push_6502_8(status | FLAG_BREAK);
+    setinterrupt();
+    cleardecimal(); /*CMOS change*/
     pc = (ushort)read6502(0xFFFE) | ((ushort)read6502(0xFFFF) << 8);
 }
 
