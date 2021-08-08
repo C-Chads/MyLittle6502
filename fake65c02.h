@@ -406,9 +406,10 @@ static void putvalue(ushort saveval) {
 static void adc() {
     penaltyop = 1;
     if (status & FLAG_DECIMAL) {
-        ushort tmp, tmp2;
+        ushort tmp, tmp2, result_saved;
         value = getvalue();
         tmp = ((ushort)a & 0x0F) + (value & 0x0F) + (ushort)(status & FLAG_CARRY);
+        result_saved = (ushort)a + value + (ushort)(status & FLAG_CARRY);
         tmp2 = ((ushort)a & 0xF0) + (value & 0xF0);
         if (tmp > 0x09) {
             tmp2 += 0x10;
@@ -426,8 +427,8 @@ static void adc() {
 		
         zerocalc(result);                /* 65C02 change, Decimal Arithmetic sets NZV */
         signcalc(result);
-		/*? I don't know if this is correct.*/
-		overflowcalc(result, a, value);
+		/*? According to the documentation, we use the results of a BINARY ADDITION for the overflow calculation..*/
+		overflowcalc(result_saved, a, value);
         clockticks6502++;
     } else {
         value = getvalue();
@@ -795,8 +796,10 @@ static void rts() {
 static void sbc() {
     penaltyop = 1;
     if (status & FLAG_DECIMAL) {
+    	ushort result_saved;
      	value = getvalue() ^ 0x00FF;
     	result = (ushort)a + value + (ushort)(status & FLAG_CARRY);
+    	result_saved = result;
         clearcarry();
         if ((result & 0x0F) > 0x09) {
             result -= 0x06;
@@ -808,7 +811,7 @@ static void sbc() {
 		zerocalc(result);                /* CMOS change, Decimal Arithmetic sets NZV */
         signcalc(result);
         /*? I believe this is correct.*/
-        overflowcalc(result, a, value);
+        overflowcalc(result_saved, a, value);
         clockticks6502++;
     } else {
         value = getvalue() ^ 0x00FF;
