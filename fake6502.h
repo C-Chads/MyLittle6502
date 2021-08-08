@@ -397,11 +397,12 @@ static void putvalue(ushort saveval) {
 
 /*instruction handler functions*/
 static void adc() {
-
+penaltyop = 1;
     
 #ifndef NES_CPU
     if (status & FLAG_DECIMAL) {
         ushort tmp, tmp2;
+        
         value = getvalue();
         tmp = ((ushort)a & 0x0F) + (value & 0x0F) + (ushort)(status & FLAG_CARRY);
         tmp2 = ((ushort)a & 0xF0) + (value & 0xF0);
@@ -424,7 +425,6 @@ static void adc() {
     } else 
 #endif
 	{
-	    penaltyop = 1;
 	    value = getvalue();
 	    result = (ushort)a + value + (ushort)(status & FLAG_CARRY);
 	   
