@@ -800,7 +800,6 @@ static void sbc() {
             result -= 0x60;
             setcarry();
         }
-        clockticks6502++;
 		zerocalc(result);                /* CMOS change, Decimal Arithmetic sets NZV */
         signcalc(result);
         clockticks6502++;

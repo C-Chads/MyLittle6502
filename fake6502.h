@@ -796,7 +796,6 @@ static void sbc() {
             result -= 0x60;
             setcarry();
         }
-        clockticks6502++;
         signcalc(result);
         /*clockticks6502++;*/
     } else 
@@ -804,6 +803,7 @@ static void sbc() {
 	{
         value = getvalue() ^ 0x00FF;
         result = (ushort)a + value + (ushort)(status & FLAG_CARRY);
+        
         carrycalc(result);
         zerocalc(result);
         overflowcalc(result, a, value);
