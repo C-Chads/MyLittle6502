@@ -12,6 +12,9 @@ The header file in this repository is in the public domain. tests.c is not. Do n
 * Fixed decimal mode adc and sbc
 * Fixed exec6502 possibly executing many billions more instructions than desired.
 * Fixed documentation
+* Fixed overflow calculation (I believe) for decimal mode. The V flag is undocumented, and its value is pretty much useless,
+but I believe it is correct. I have yet to run the test code from http://www.6502.org/tutorials/decimal_mode.html#A
+but it is a TODO. 
 
 
 
