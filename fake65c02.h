@@ -426,7 +426,8 @@ static void adc() {
 		
         zerocalc(result);                /* 65C02 change, Decimal Arithmetic sets NZV */
         signcalc(result);
-		/*TODO: emulate overflow calculation.*/
+		/*? I don't know if this is correct.*/
+		overflowcalc(result, a, value);
         clockticks6502++;
     } else {
         value = getvalue();
@@ -495,6 +496,12 @@ static void bit() {
     result = (ushort)a & value;
     zerocalc(result);
     status = (status & 0x3F) | (uint8)(value & 0xC0);
+}
+
+static void bit_imm() {
+    value = getvalue();
+    result = (ushort)a & value;
+    zerocalc(result);
 }
 
 static void bmi() {
@@ -792,7 +799,6 @@ static void sbc() {
      	value = getvalue() ^ 0x00FF;
     	result = (ushort)a + value + (ushort)(status & FLAG_CARRY);
         clearcarry();
-        /*result -= 0x66;*/
         if ((result & 0x0F) > 0x09) {
             result -= 0x06;
         }
@@ -802,11 +808,13 @@ static void sbc() {
         }
 		zerocalc(result);                /* CMOS change, Decimal Arithmetic sets NZV */
         signcalc(result);
+        /*TODO: overflow calculation.*/
+        overflowcalc(result, a, value);
         clockticks6502++;
     } else {
         value = getvalue() ^ 0x00FF;
         result = (ushort)a + value + (ushort)(status & FLAG_CARRY);
-
+	
         carrycalc(result);
         zerocalc(result);
         overflowcalc(result, a, value);
@@ -1052,7 +1060,7 @@ static void (*optable[256])() = {
 /* 5 */      bvc,  eor,  eor,  nop,  nop,  eor,  lsr, rmb5,  cli,  eor,  phy,  nop,  nop,  eor,  lsr, bbr5, /* 5 */
 /* 6 */      rts,  adc,  nop,  nop,  stz,  adc,  ror, rmb6,  pla,  adc,  ror,  nop,  jmp,  adc,  ror, bbr6, /* 6 */
 /* 7 */      bvs,  adc,  adc,  nop,  stz,  adc,  ror, rmb7,  sei,  adc,  ply,  nop,  jmp,  adc,  ror, bbr7, /* 7 */
-/* 8 */      bra,  sta,  nop,  nop,  sty,  sta,  stx, smb0,  dey,  bit,  txa,  nop,  sty,  sta,  stx, bbs0, /* 8 */
+/* 8 */      bra,  sta,  nop,  nop,  sty,  sta,  stx, smb0,  dey,  bit_imm,  txa,  nop,  sty,  sta,  stx, bbs0, /* 8 */
 /* 9 */      bcc,  sta,  sta,  nop,  sty,  sta,  stx, smb1,  tya,  sta,  txs,  nop,  stz,  sta,  stz, bbs1, /* 9 */
 /* A */      ldy,  lda,  ldx,  nop,  ldy,  lda,  ldx, smb2,  tay,  lda,  tax,  nop,  ldy,  lda,  ldx, bbs2, /* A */
 /* B */      bcs,  lda,  lda,  nop,  ldy,  lda,  ldx, smb3,  clv,  lda,  tsx,  nop,  ldy,  lda,  ldx, bbs3, /* B */

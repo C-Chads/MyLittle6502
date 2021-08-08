@@ -1121,14 +1121,14 @@ int bit_imm_opcode() {
     exec_instruction(0x89, 0xff, 0x00);
     CHECK(a, 0x50);
     CHECKFLAG(FLAG_ZERO, 0);
-    CHECKFLAG(FLAG_SIGN, 1); /*originally tested for 1*/
+    CHECKFLAG(FLAG_SIGN, 0); /*originally tested for 0*/
     CHECKFLAG(FLAG_CARRY, 0);
     CHECK(pc, 0x0202);
 
     exec_instruction(0x89, 0x80, 0x00);
     CHECK(a, 0x50);
     CHECKFLAG(FLAG_ZERO, 1);
-    CHECKFLAG(FLAG_SIGN, 1); /*originally tested for 0*/
+    CHECKFLAG(FLAG_SIGN, 0); /*originally tested for 0*/
     CHECKFLAG(FLAG_CARRY, 0);
     CHECK(pc, 0x0204);
 
