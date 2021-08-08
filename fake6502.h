@@ -398,6 +398,7 @@ static void putvalue(ushort saveval) {
 /*instruction handler functions*/
 static void adc() {
     penaltyop = 1;
+#ifndef NES_CPU
     if (status & FLAG_DECIMAL) {
         ushort tmp, tmp2;
         value = getvalue();
@@ -422,7 +423,9 @@ static void adc() {
 		/*? I don't know if this is correct.*/
 		overflowcalc(result, a, value);
         /*clockticks6502++;*/
-    } else {
+    } else 
+#endif
+    {
         value = getvalue();
         result = (ushort)a + value + (ushort)(status & FLAG_CARRY);
         carrycalc(result);
@@ -779,6 +782,7 @@ static void rts() {
 
 static void sbc() {
     penaltyop = 1;
+#ifndef NES_CPU
     if (status & FLAG_DECIMAL) {
      	value = getvalue() ^ 0x00FF;
     	result = (ushort)a + value + (ushort)(status & FLAG_CARRY);
@@ -795,7 +799,9 @@ static void sbc() {
         /*? I believe this is correct.*/
         overflowcalc(result, a, value);
         /*clockticks6502++;*/
-    } else {
+    } else 
+#endif
+    {
         value = getvalue() ^ 0x00FF;
         result = (ushort)a + value + (ushort)(status & FLAG_CARRY);
 	
