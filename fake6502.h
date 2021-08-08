@@ -398,29 +398,38 @@ static void putvalue(ushort saveval) {
 /*instruction handler functions*/
 static void adc() {
     penaltyop = 1;
-    value = getvalue();
-    result = (ushort)a + value + (ushort)(status & FLAG_CARRY);
-   
-    carrycalc(result);
-    zerocalc(result);
-    overflowcalc(result, a, value);
-    signcalc(result);
-    
-#ifndef NES_CPU
     if (status & FLAG_DECIMAL) {
-        clearcarry();
-        if ((result & 0x0F) > 0x09) {
-            result += 0x06;
+        ushort tmp, tmp2;
+        value = getvalue();
+        tmp = ((ushort)a & 0x0F) + (value & 0x0F) + (ushort)(status & FLAG_CARRY);
+        tmp2 = ((ushort)a & 0xF0) + (value & 0xF0);
+        if (tmp > 0x09) {
+            tmp2 += 0x10;
+            tmp += 0x06;
         }
-        if ((result & 0xF0) > 0x90) {
-            result += 0x60;
+        if (tmp2 > 0x90) {
+            tmp2 += 0x60;
+        }
+        if (tmp2 & 0xFF00) {
             setcarry();
+        } else {
+            clearcarry();
         }
-        overflowcalc(result, a, value); /*Overflow calculation emulation.*/
-        clockticks6502++;
+        result = (tmp & 0x0F) | (tmp2 & 0xF0);
+		
+        /*zerocalc(result);*/                /* 65C02 change, Decimal Arithmetic sets NZV */
+        signcalc(result);
+		/*? I don't know if this is correct.*/
+		overflowcalc(result, a, value);
+        /*clockticks6502++;*/
+    } else {
+        value = getvalue();
+        result = (ushort)a + value + (ushort)(status & FLAG_CARRY);
+        carrycalc(result);
+        zerocalc(result);
+        overflowcalc(result, a, value);
+        signcalc(result);
     }
-#endif
-   
     saveaccum(result);
 }
 
@@ -769,26 +778,11 @@ static void rts() {
 }
 
 static void sbc() {
-/*
-	3a. AL = (A & $0F) - (B & $0F) + C-1
-	3b. If AL < 0, then AL = ((AL - $06) & $0F) - $10
-	3c. A = (A & $F0) - (B & $F0) + AL
-	3d. If A < 0, then A = A - $60
-	3e. The accumulator result is the lower 8 bits of A
-*/
     penaltyop = 1;
-    value = getvalue() ^ 0x00FF;
-    result = (ushort)a + value + (ushort)(status & FLAG_CARRY);
-   
-    carrycalc(result);
-    zerocalc(result);
-    overflowcalc(result, a, value);
-    signcalc(result);
-
-#ifndef NES_CPU
     if (status & FLAG_DECIMAL) {
+     	value = getvalue() ^ 0x00FF;
+    	result = (ushort)a + value + (ushort)(status & FLAG_CARRY);
         clearcarry();
-        /*result -= 0x66;*/
         if ((result & 0x0F) > 0x09) {
             result -= 0x06;
         }
@@ -796,11 +790,20 @@ static void sbc() {
             result -= 0x60;
             setcarry();
         }
-        overflowcalc(result, a, value); /*Overflow value calculation.*/
-        clockticks6502++;
+		/*zerocalc(result);*/                /* CMOS change, Decimal Arithmetic sets NZV */
+        signcalc(result);
+        /*? I believe this is correct.*/
+        overflowcalc(result, a, value);
+        /*clockticks6502++;*/
+    } else {
+        value = getvalue() ^ 0x00FF;
+        result = (ushort)a + value + (ushort)(status & FLAG_CARRY);
+	
+        carrycalc(result);
+        zerocalc(result);
+        overflowcalc(result, a, value);
+        signcalc(result);
     }
-#endif
-   
     saveaccum(result);
 }
 

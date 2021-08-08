@@ -438,7 +438,6 @@ static void adc() {
         overflowcalc(result, a, value);
         signcalc(result);
     }
-
     saveaccum(result);
 }
 
@@ -820,7 +819,6 @@ static void sbc() {
         overflowcalc(result, a, value);
         signcalc(result);
     }
-
     saveaccum(result);
 }
 
