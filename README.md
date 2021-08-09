@@ -10,6 +10,8 @@ The tests files are not! They are GPL'd instruction set exercisers.
 
 # CHANGELOG
 
+* Wrote decimal mode according to http://www.6502.org/tutorials/decimal_mode.html#A
+to be exactly correct.
 * Fixed interrupt masking.
 * Fixed decimal mode adc and sbc
 * Fixed exec6502 possibly executing many billions more instructions than desired.

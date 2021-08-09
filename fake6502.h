@@ -789,7 +789,7 @@ static void sbc() {
     	AL = (A & 0x0F) - (B & 0x0F) + (ushort)(status & FLAG_CARRY) -1; /* 3a*/
     	if(AL & 0x8000)  AL =  ((AL - 0x06) & 0x0F) - 0x10; /*3b*/
     	A = (A & 0xF0) - (B & 0xF0) + AL; /*3c*/
-    	if(A & 0x8000) A = A - 0x60;
+    	if(A & 0x8000) A = A - 0x60; /*3d*/
     	result = A;
     } else 
 #endif

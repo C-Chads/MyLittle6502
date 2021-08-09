@@ -801,7 +801,7 @@ static void sbc() {
     	A = A - B + C - 1; /*4b*/
     	if(A & 0x8000) A = A - 0x60; /*4C*/
     	if(AL & 0x8000) A = A - 0x06; /*4D*/
-    	result = A & 0xff;
+    	result = A & 0xff; /*3e*/
     	signcalc(result);
     	zerocalc(result);
         clockticks6502++;
