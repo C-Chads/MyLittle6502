@@ -511,10 +511,10 @@ int decimal_mode() {
     CHECK(pc, 0x204);
     CHECK(a, 0x00);
 
-    //exec_instruction(0x18, 0x00, 0x00); // CLC
-    exec_instruction(0x38, 0x00, 0x00); // SEC
+    exec_instruction(0x18, 0x00, 0x00); // CLC
+    //exec_instruction(0x38, 0x00, 0x00); // SEC
     CHECK(pc, 0x205);
-    CHECKFLAG(FLAG_CARRY, 1);
+    CHECKFLAG(FLAG_CARRY, 0);
     /*ODDITY- carry flag doesn't matter here! Huh!*/
 
     exec_instruction(0xe9, 0x01, 0x00); // SBC #$01
@@ -527,14 +527,14 @@ int decimal_mode() {
     exec_instruction(0xe9, 0x10, 0x00); // SBC #$10
     CHECK(pc, 0x209);
     CHECKFLAG(FLAG_CARRY, 1);
-    CHECK(a, 0x88); /*this is the result.*/
+    CHECK(a, 0x87); /*this is the result.*/
     
 
     exec_instruction(0x38, 0x00, 0x00); /* SEC*/
     CHECK(pc, 0x20A);
 	CHECKFLAG(FLAG_CARRY, 1); 
 	
-    exec_instruction(0xe9, 0x04, 0x00); /* SBC #$4*/
+    exec_instruction(0xe9, 0x03, 0x00); /* SBC #$3*/
     CHECK(pc, 0x20C);
     CHECK(a, 0x84);
 	CHECKFLAG(FLAG_CARRY, 1); 

@@ -775,8 +775,9 @@ static void sbc() {
     penaltyop = 1;
 #ifndef NES_CPU
     if (status & FLAG_DECIMAL) {
-    	ushort result_dec, A, AL, B;
+    	ushort result_dec, A, AL, B, C;
     	A = a;
+    	C = (ushort)(status & FLAG_CARRY);
      	value = getvalue();B = value;value = value ^ 0x00FF;
     	result_dec = (ushort)a + value + (ushort)(status & FLAG_CARRY); /*dec*/
 		/*Both Cmos and Nmos*/
@@ -786,7 +787,7 @@ static void sbc() {
     	signcalc(result_dec);
     	zerocalc(result_dec);
 		/*Sequence 3 is NMOS ONLY*/
-    	AL = (A & 0x0F) - (B & 0x0F) + (ushort)(status & FLAG_CARRY) -1; /* 3a*/
+    	AL = (A & 0x0F) - (B & 0x0F) + C -1; /* 3a*/
     	if(AL & 0x8000)  AL =  ((AL - 0x06) & 0x0F) - 0x10; /*3b*/
     	A = (A & 0xF0) - (B & 0xF0) + AL; /*3c*/
     	if(A & 0x8000) A = A - 0x60; /*3d*/
