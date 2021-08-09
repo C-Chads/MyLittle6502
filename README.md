@@ -162,5 +162,33 @@ Q: I'm writing an NES emulator...
 
 A: Another one?
 
+Q: Can this be used to emulate the commander X16?
 
+A: Yes. Some changes were adapted from the Commander X16's emulator, although that emulator has bugs in some of its decimal mode ops.
 
+Those bugs have been fixed in this repository.
+
+Q: I have found a bug in your implementation!
+
+A: Make an issue about it!
+
+Q: Did you implement decimal mode correctly?
+
+A: I believe so. The overflow flag works based on the results of a binary (not BCD) addition or subtraction,
+
+which is what I have implemented. It's what 6502.org says.
+
+The carry flag is *not* set back to one (the non-carry state, it is an inverse borrow) by SBC if a carry does not occur.
+
+This is, I believe, the intended behavior. However, it means that having the carry flag cleared will cause more than just
+
+the subsequent SBC to be treated as if a carry occured. Specifically, if the accumulator starts out at 0 and the
+
+carry flag starts out at 5 (inverse borrow) then...
+
+```asm
+SED   ; enable decimal mode
+SBC 4 ; the carry flag is set so an additional 1 is subtracted.
+SBC 1 ; This causes A to be 99. The carry flag is now 
+
+```

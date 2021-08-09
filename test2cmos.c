@@ -498,8 +498,6 @@ int test_zpx() {
 }
 
 int decimal_mode() {
-     
-
     a = 0x89;
     pc = 0x200;
     status = FLAG_DECIMAL; // Turn on decimal mode, clear carry flag
@@ -519,35 +517,37 @@ int decimal_mode() {
 
     exec_instruction(0xe9, 0x01, 0x00); // SBC #$01
     CHECK(pc, 0x207);
-    CHECK(a, 0x98); /*The carry bit is not set, so a subtraction should take us down to 98! However, the carry bit *will* be set after this.*/
+    CHECK(a, 0x98); 
+    CHECKFLAG(FLAG_CARRY, 0); /*Inverse borrow- carry should be 0.*/
+    /*The carry bit is not set, so a subtraction should take us down to 98! However, the carry bit *will* be set after this.*/
 
-	/*This instruction starts with the carry bit set, due to the previous instruction.*/
+	/*This instruction starts with the carry bit not set, */
     exec_instruction(0xe9, 0x10, 0x00); // SBC #$10
     CHECK(pc, 0x209);
-    CHECK(a, 0x88); /*this is the result.*/
-    CHECKFLAG(FLAG_CARRY, 0); /*The carry bit should be 0.*/
+    CHECKFLAG(FLAG_CARRY, 1);
+    CHECK(a, 0x87); /*this is the result.*/
+    
 
     exec_instruction(0x38, 0x00, 0x00); /* SEC*/
     CHECK(pc, 0x20A);
-	CHECKFLAG(FLAG_CARRY, 1); /*The carry bit should be 1.*/
+	CHECKFLAG(FLAG_CARRY, 1); 
 	
     exec_instruction(0xe9, 0x04, 0x00); /* SBC #$4*/
     CHECK(pc, 0x20C);
-    CHECK(a, 0x84);
-	CHECKFLAG(FLAG_CARRY, 0); 
-	/*the carry bit is not set so it will subtract 5 even though we tell it o sub 4.*/
+    CHECK(a, 0x83);
+	CHECKFLAG(FLAG_CARRY, 1); 
+	/*the carry bit is set so it will subtract 4*/
     exec_instruction(0xe9, 0x04, 0x00); // SBC #$4
     CHECK(pc, 0x20E);
     CHECK(a, 0x79);
-	CHECKFLAG(FLAG_CARRY, 0); 
-	/*the carry bit is not set so it will subtract 3 instead of just two.*/
+	CHECKFLAG(FLAG_CARRY, 1); 
+	/*the carry bit is set so it will subtract 2 instead of just two.*/
     exec_instruction(0xe9, 0x02, 0x00); // SBC #$2
     CHECK(pc, 0x210);
-    CHECK(a, 0x76);
+    CHECK(a, 0x77);
     
     return 0;
 }
-
 int binary_mode() {
     a = 0x89;
     pc = 0x200;
@@ -567,11 +567,13 @@ int binary_mode() {
     exec_instruction(0xe9, 0x01, 0x00); // SBC #$01
     CHECK(pc, 0x207);
     CHECK(a, 0x9c); /*BUG! the carry flag was not set. it should be 9c, not 9d.*/
-
+	CHECKFLAG(FLAG_CARRY, 1);
+	
     exec_instruction(0xe9, 0x10, 0x00); // SBC #$10
     CHECK(pc, 0x209);
-    CHECK(a, 0x8c); /*The carry flag still isn't set. We still subtract an extra one.*/
-
+    CHECK(a, 0x8c); /*The carry flag was set, */
+	CHECKFLAG(FLAG_CARRY, 1); /*Continued subtractions should permit continuing the result.*/
+	
     return 0;
 }
 

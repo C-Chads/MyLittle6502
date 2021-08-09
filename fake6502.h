@@ -789,18 +789,17 @@ static void sbc() {
      	value = getvalue() ^ 0x00FF;
     	result = (ushort)a + value + (ushort)(status & FLAG_CARRY);
     	result_saved = result;
-        clearcarry();
+    	setcarry();
         if ((result & 0x0F) > 0x09) {
             result -= 0x06;
         }
         if ((result & 0xF0) > 0x90) {
             result -= 0x60;
-            setcarry();
+            clearcarry();
         }
         signcalc(result);
         /*? I believe this is correct.*/
         overflowcalc(result_saved, a, value);
-        /*clockticks6502++;*/
     } else 
 #endif
     {
