@@ -118,26 +118,26 @@ These are the functions as they are declared in fake6502.h:
 
 ```c
  void reset6502()
-   - Call this once before you begin execution.    
+   /* Call this once before you begin execution*/
                                                    
- void exec6502(uint32 tickcount)                 
-   - Execute 6502 code up to the next specified  
-     count of clock ticks.                       
+ uint32 exec6502(uint32 tickcount)                 
+   /* Execute 6502 code up to, and possibly one instruction over, the next specified
+     count of clock ticks. Returns the number of clock ticks actually executed. */
+
+ uint32 step6502()
+   /*Execute a single instrution. */
                                                  
- void step6502()                                 
-   - Execute a single instrution.                
-                                                 
- void irq6502()                                  
-   - Trigger a hardware IRQ in the 6502 core.    
-                                                 
+ void irq6502()
+   /* Trigger a hardware IRQ in the 6502 core.    */
+
  void nmi6502()                                  
-   - Trigger an NMI in the 6502 core.            
+   /* Trigger an NMI in the 6502 core. */
                                                  
  void hookexternal(void *funcptr)                
-   - Pass a pointer to a void function taking no 
+   /* Pass a pointer to a void function taking no 
      parameters. This will cause Fake6502 to call
      that function once after each emulated      
-     instruction.
+     instruction. */
  ```
 
  Q: why did you define these weird types like "ushort" and "uint8"!!! Why not just use stdint
