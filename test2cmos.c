@@ -512,8 +512,10 @@ int decimal_mode() {
     CHECK(a, 0x00);
 
     exec_instruction(0x18, 0x00, 0x00); // CLC
+    //exec_instruction(0x38, 0x00, 0x00); // SEC
     CHECK(pc, 0x205);
     CHECKFLAG(FLAG_CARRY, 0);
+    /*ODDITY- carry flag doesn't matter here! Huh!*/
 
     exec_instruction(0xe9, 0x01, 0x00); // SBC #$01
     CHECK(pc, 0x207);
@@ -521,7 +523,7 @@ int decimal_mode() {
     CHECKFLAG(FLAG_CARRY, 0); /*Inverse borrow- carry should be 0.*/
     /*The carry bit is not set, so a subtraction should take us down to 98! However, the carry bit *will* be set after this.*/
 
-	/*This instruction starts with the carry bit not set, */
+	/*This instruction starts with the carry bit not set, so we expect it to subtract an extra. */
     exec_instruction(0xe9, 0x10, 0x00); // SBC #$10
     CHECK(pc, 0x209);
     CHECKFLAG(FLAG_CARRY, 1);
@@ -532,19 +534,19 @@ int decimal_mode() {
     CHECK(pc, 0x20A);
 	CHECKFLAG(FLAG_CARRY, 1); 
 	
-    exec_instruction(0xe9, 0x04, 0x00); /* SBC #$4*/
+    exec_instruction(0xe9, 0x03, 0x00); /* SBC #$3*/
     CHECK(pc, 0x20C);
-    CHECK(a, 0x83);
+    CHECK(a, 0x84);
 	CHECKFLAG(FLAG_CARRY, 1); 
 	/*the carry bit is set so it will subtract 4*/
     exec_instruction(0xe9, 0x04, 0x00); // SBC #$4
     CHECK(pc, 0x20E);
-    CHECK(a, 0x79);
+    CHECK(a, 0x80);
 	CHECKFLAG(FLAG_CARRY, 1); 
 	/*the carry bit is set so it will subtract 2 instead of just two.*/
     exec_instruction(0xe9, 0x02, 0x00); // SBC #$2
     CHECK(pc, 0x210);
-    CHECK(a, 0x77);
+    CHECK(a, 0x78);
     
     return 0;
 }

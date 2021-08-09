@@ -400,30 +400,20 @@ static void adc() {
     penaltyop = 1;
 #ifndef NES_CPU
     if (status & FLAG_DECIMAL) {
-        ushort tmp, tmp2, result_saved;
+        ushort AL, A, tmp2, result_dec;
+        A = a;
         value = getvalue();
-        tmp = ((ushort)a & 0x0F) + (value & 0x0F) + (ushort)(status & FLAG_CARRY);
-        result_saved = (ushort)a + value + (ushort)(status & FLAG_CARRY);
-        tmp2 = ((ushort)a & 0xF0) + (value & 0xF0);
-        if (tmp > 0x09) {
-            tmp2 += 0x10;
-            tmp += 0x06;
-        }
-        if (tmp2 > 0x90) {
-            tmp2 += 0x60;
-        }
-        if (tmp2 & 0xFF00) {
-            setcarry();
-        } else {
-            clearcarry();
-        }
-        result = (tmp & 0x0F) | (tmp2 & 0xF0);
-		
-        /*zerocalc(result);*/                /* 65C02 change, Decimal Arithmetic sets NZV */
-        signcalc(result);
-		/*? According to the documentation, we use the results of a BINARY ADDITION for the overflow calculation..*/
-		overflowcalc(result_saved, a, value);
-        /*clockticks6502++;*/
+        result_dec = (ushort)A + value + (ushort)(status & FLAG_CARRY); /*dec*/
+        
+        AL = (A & 0x0F) + (value & 0x0F) + (ushort)(status & FLAG_CARRY);  /*SEQ 1A OR 2A*/
+        if(AL >= 0xA) AL = ((AL + 0x06) & 0x0F) + 0x10; /*SEQ 1B OR SEQ 2B*/
+        A = (A & 0xF0) + (value & 0xF0) + AL; /*SEQ2C OR SEQ 1C*/
+        if(A & 0x80) setsign(); else clearsign(); /*SEQ 2E it says "bit 7"*/
+        if(A >= 0xA0) A += 0x60; /*SEQ 1E*/
+        result = A;
+        if(A & 0xff80) setoverflow();else clearoverflow();
+
+        zerocalc(result_dec); /*Original nmos does zerocalc on the binary result.*/
     } else 
 #endif
     {
@@ -785,21 +775,22 @@ static void sbc() {
     penaltyop = 1;
 #ifndef NES_CPU
     if (status & FLAG_DECIMAL) {
-    	ushort result_saved;
-     	value = getvalue() ^ 0x00FF;
-    	result = (ushort)a + value + (ushort)(status & FLAG_CARRY);
-    	result_saved = result;
-    	setcarry();
-        if ((result & 0x0F) > 0x09) {
-            result -= 0x06;
-        }
-        if ((result & 0xF0) > 0x90) {
-            result -= 0x60;
-            clearcarry();
-        }
-        signcalc(result);
-        /*? I believe this is correct.*/
-        overflowcalc(result_saved, a, value);
+    	ushort result_dec, A, AL, B;
+    	A = a;
+     	value = getvalue();B = value;value = value ^ 0x00FF;
+    	result_dec = (ushort)a + value + (ushort)(status & FLAG_CARRY); /*dec*/
+		/*Both Cmos and Nmos*/
+    	carrycalc(result_dec); 
+    	overflowcalc(result_dec, a, value); 
+    	/*NMOS ONLY*/
+    	signcalc(result_dec);
+    	zerocalc(result_dec);
+		/*Sequence 3 is NMOS ONLY*/
+    	AL = (A & 0x0F) - (B & 0x0F) + (ushort)(status & FLAG_CARRY) -1; /* 3a*/
+    	if(AL & 0x8000)  AL =  ((AL - 0x06) & 0x0F) - 0x10; /*3b*/
+    	A = (A & 0xF0) - (B & 0xF0) + AL; /*3c*/
+    	if(A & 0x8000) A = A - 0x60;
+    	result = A;
     } else 
 #endif
     {

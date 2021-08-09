@@ -407,29 +407,20 @@ static void putvalue(ushort saveval) {
 static void adc() {
     penaltyop = 1;
     if (status & FLAG_DECIMAL) {
-        ushort tmp, tmp2, result_saved;
+        ushort AL, A, tmp2, result_dec;
+        A = a;
         value = getvalue();
-        tmp = ((ushort)a & 0x0F) + (value & 0x0F) + (ushort)(status & FLAG_CARRY);
-        result_saved = (ushort)a + value + (ushort)(status & FLAG_CARRY);
-        tmp2 = ((ushort)a & 0xF0) + (value & 0xF0);
-        if (tmp > 0x09) {
-            tmp2 += 0x10;
-            tmp += 0x06;
-        }
-        if (tmp2 > 0x90) {
-            tmp2 += 0x60;
-        }
-        if (tmp2 & 0xFF00) {
-            setcarry();
-        } else {
-            clearcarry();
-        }
-        result = (tmp & 0x0F) | (tmp2 & 0xF0);
-		
+        result_dec = (ushort)A + value + (ushort)(status & FLAG_CARRY); /*dec*/
+
+        AL = (A & 0x0F) + (value & 0x0F) + (ushort)(status & FLAG_CARRY); /*SEQ 1A or 2A*/
+        if(AL >= 0xA) AL = ((AL + 0x06) & 0x0F) + 0x10; /*1B or 2B*/
+        A = (A & 0xF0) + (value & 0xF0) + AL; /*1C or 2C*/
+        if(A >= 0xA0) A += 0x60; /*1E*/
+        result = A;
+        if(A & 0xff80) setoverflow();
+        else clearoverflow();
         zerocalc(result);                /* 65C02 change, Decimal Arithmetic sets NZV */
         signcalc(result);
-		/*? According to the documentation, we use the results of a BINARY ADDITION for the overflow calculation..*/
-		overflowcalc(result_saved, a, value);
         clockticks6502++;
     } else {
         value = getvalue();
@@ -797,27 +788,26 @@ static void rts() {
 static void sbc() {
     penaltyop = 1;
     if (status & FLAG_DECIMAL) {
-    	ushort result_saved;
-     	value = getvalue() ^ 0x00FF;
-    	result = (ushort)a + value + (ushort)(status & FLAG_CARRY);
-    	result_saved = result;
-    	setcarry();
-        if ((result & 0x0F) > 0x09) {
-            result -= 0x06;
-        }
-        if ((result & 0xF0) > 0x90) {
-            result -= 0x60;
-            clearcarry();
-        }
-		zerocalc(result);                /* CMOS change, Decimal Arithmetic sets NZV */
-        signcalc(result);
-        /*? I believe this is correct.*/
-        overflowcalc(result_saved, a, value);
+    	ushort result_dec, A, AL, B, C;
+    	A = a;
+    	C = (ushort)(status & FLAG_CARRY);
+     	value = getvalue(); B = value; value = value ^ 0x00FF;
+    	result_dec = (ushort)a + value + C;
+		/*Both Cmos and Nmos*/
+    	carrycalc(result_dec); 
+    	overflowcalc(result_dec, a, value); 
+		/*SEQUENCE 4 IS CMOS ONLY*/
+    	AL = (A & 0x0F) - (B & 0x0F) + C - 1; /*4a*/
+    	A = A - B + C - 1; /*4b*/
+    	if(A & 0x8000) A = A - 0x60; /*4C*/
+    	if(AL & 0x8000) A = A - 0x06; /*4D*/
+    	result = A & 0xff;
+    	signcalc(result);
+    	zerocalc(result);
         clockticks6502++;
     } else {
         value = getvalue() ^ 0x00FF;
         result = (ushort)a + value + (ushort)(status & FLAG_CARRY);
-	
         carrycalc(result);
         zerocalc(result);
         overflowcalc(result, a, value);
