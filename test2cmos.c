@@ -1583,7 +1583,7 @@ test_t cmos_tests[] = {{"CMOS jmp indirect", &cmos_jmp_indirect},
                        {"Immediate BIT", &bit_imm_opcode},
                        {"(absolute,x)", &cmos_jmp_absxi},
                        {"(zp) addressing", &test_zpi},
-                       {"pushes and pulls", &pushme_pullyou},
+                       {"CMOS pushes and pulls", &pushme_pullyou},
                        {"stz", &stz_opcode},
                        {NULL, NULL}};
 
