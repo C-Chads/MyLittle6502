@@ -224,7 +224,7 @@ uint8 sp, a, x, y, status;
 /*helper variables*/
 uint32 instructions = 0; 
 uint32 clockticks6502 = 0;
-uint32 clockgoal6502 = 0; /*Made a signed number.*/
+uint32 clockgoal6502 = 0;
 ushort oldpc, ea, reladdr, value, result;
 uint8 opcode, oldstatus;
 #else

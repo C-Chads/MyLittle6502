@@ -98,6 +98,22 @@ ushort oldpc, ea, reladdr, value, result;
 uint8 opcode, oldstatus;
 ```
 
+And for fake65c02, there is an additional variable "waiting" which indicates if the WAI instruction has been executed,
+meaning that the processor will not execute anything until an interrupt occurs.
+
+```
+/*6502 CPU registers*/
+ushort pc;
+uint8 sp, a, x, y, status;
+/*helper variables*/
+uint32 instructions = 0; 
+uint32 clockticks6502 = 0;
+uint32 clockgoal6502 = 0;
+ushort oldpc, ea, reladdr, value, result;
+uint8 opcode, oldstatus, waiting6502 = 0;
+```
+
+
 These are the functions as they are declared in fake6502.h:
 
 ```c
