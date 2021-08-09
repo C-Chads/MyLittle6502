@@ -354,7 +354,7 @@ static void absy() { /*absolute,Y*/
 static void ind() { /*indirect*/
     ushort eahelp, eahelp2;
     eahelp = (ushort)read6502(pc) | (ushort)((ushort)read6502(pc+1) << 8);
-    /*Page boundary bug is abset on CMOS models.*/
+    /*Page boundary bug is absent on CMOS models.*/
     eahelp2 = (eahelp+1) & 0xffFF;
     ea = (ushort)read6502(eahelp) | ((ushort)read6502(eahelp2) << 8);
     pc += 2;
@@ -379,7 +379,7 @@ static void indy() { /* (indirect),Y*/
     }
 }
 
-static void zprel() { /* zero-page, relative for branch ops (8-bit immediatel value, sign-extended)*/
+static void zprel() { /* zero-page, relative for branch ops (8-bit immediate value, sign-extended)*/
 	ea = (ushort)read6502(pc);
 	reladdr = (ushort)read6502(pc+1);
 	if (reladdr & 0x80) reladdr |= 0xFF00;
@@ -897,7 +897,6 @@ static void ind0() {
     eahelp = (ushort)read6502(pc++);
     eahelp2 = (eahelp & 0xFF00) | ((eahelp + 1) & 0x00FF); /*zero page wrap*/
     ea = (ushort)read6502(eahelp) | ((ushort)read6502(eahelp2) << 8);
-
 }
 
 static void ainx() { 		/* abs indexed bra*/
@@ -991,7 +990,7 @@ static void bbs(ushort bitmask)
 	if ((getvalue() & bitmask) != 0) {
 		oldpc = pc;
 		pc += reladdr;
-		if ((oldpc & 0xFF00) != (pc & 0xFF00)) clockticks6502 += 2; //check if jump crossed a page boundary
+		if ((oldpc & 0xFF00) != (pc & 0xFF00)) clockticks6502 += 2; /*check if jump crossed a page boundary*/
 		else clockticks6502++;
 	}
 }
@@ -1024,15 +1023,16 @@ static void rmb6() { putvalue(getvalue() & ~0x40); }
 static void rmb7() { putvalue(getvalue() & ~0x80); }
 
 /*undocumented instructions~~~~~~~~~~~~~~~~~~~~~~~~~*/
-#define lax nop
-#define sax nop
-#define dcp nop
-#define isb nop
-#define slo nop
-#define rla nop
-#define sre nop
-#define rra nop
-
+/*
+	#define lax nop
+	#define sax nop
+	#define dcp nop
+	#define isb nop
+	#define slo nop
+	#define rla nop
+	#define sre nop
+	#define rra nop
+*/
 
 static void (*addrtable[256])() = {
 /*        |  0  |  1  |  2  |  3  |  4  |  5  |  6  |  7  |  8  |  9  |  A  |  B  |  C  |  D  |  E  |  F  |     */
@@ -1055,9 +1055,7 @@ static void (*addrtable[256])() = {
 };
 
 /*
-	NOTE: the "db6502" instruction is *supposed* to be "wait until hardware reset.
-
-	
+	NOTE: the "db6502" instruction is *supposed* to be "wait until hardware reset"
 */
 
 static void (*optable[256])() = {
@@ -1185,6 +1183,8 @@ void hookexternal(void *funcptr) {
 }
 
 /*
-	Changes checked against http://6502.org/tutorials/65c02opcodes.html
-	and https://github.com/commanderx16/x16-emulator
+	Changes checked against 
+	http://6502.org/tutorials/65c02opcodes.html
+	and 
+	https://github.com/commanderx16/x16-emulator
 */
