@@ -283,6 +283,7 @@ void reset6502() {
     x = 0;
     y = 0;
     sp = 0xFD;
+    status &= ~FLAG_DECIMAL;
     status |= FLAG_CONSTANT | FLAG_INTERRUPT;
 }
 
@@ -1094,6 +1095,7 @@ void nmi6502() {
     push_6502_16(pc);
     push_6502_8(status  & ~FLAG_BREAK);
     status |= FLAG_INTERRUPT;
+    status &= ~FLAG_DECIMAL;
     pc = (ushort)read6502(0xFFFA) | ((ushort)read6502(0xFFFB) << 8);
     waiting6502 = 0;
 }
@@ -1109,6 +1111,7 @@ void irq6502() {
 		push_6502_16(pc);
 		push_6502_8(status & ~FLAG_BREAK);
 		status |= FLAG_INTERRUPT;
+		status &= ~FLAG_DECIMAL;
 		/*pc = mem_6502_read16(0xfffe);*/
 		pc = (ushort)read6502(0xFFFE) | ((ushort)read6502(0xFFFF) << 8);
 		waiting6502 = 0;
