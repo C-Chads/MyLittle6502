@@ -4,7 +4,9 @@ Mike Chambers' Fake6502 with revamped bug fixes for decimal mode, along with a f
 
 Now with an all-new Fake65c02 for the CMOS chip.
 
-The header file in this repository is in the public domain. tests.c is not. Do not put it in a public domain project.
+The header files in this repository are in the public domain.
+
+The tests files are not! They are GPL'd instruction set exercisers.
 
 # CHANGELOG
 
