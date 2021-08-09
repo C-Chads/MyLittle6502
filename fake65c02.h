@@ -960,7 +960,10 @@ static void trb() {
     putvalue(result);
 }
 
-static void dummy(){return;}
+static void db6502(){
+	pc--; /*This is how we wait until RESET.*/
+	return;
+}
 
 static void wai() {
 	if (~status & FLAG_INTERRUPT) waiting6502 = 1;
@@ -1051,6 +1054,12 @@ static void (*addrtable[256])() = {
 /* F */     rel, indy, ind0,  imp,  imp,  zpx,  zpx,   zp,  imp, absy,  imp,  imp,  imp, absx, absx,zprel  /* F */
 };
 
+/*
+	NOTE: the "db6502" instruction is *supposed* to be "wait until hardware reset.
+
+	
+*/
+
 static void (*optable[256])() = {
 /*        |  0  |  1  |  2  |  3  |  4  |  5  |  6  |  7  |  8  |  9  |  A  |  B  |  C  |  D  |  E  |  F  |     */
 /* 0 */      brk_6502,  ora,  nop,  nop,  tsb,  ora,  asl, rmb0,  php,  ora,  asl,  nop,  tsb,  ora,  asl, bbr0, /* 0 */
@@ -1066,7 +1075,7 @@ static void (*optable[256])() = {
 /* A */      ldy,  lda,  ldx,  nop,  ldy,  lda,  ldx, smb2,  tay,  lda,  tax,  nop,  ldy,  lda,  ldx, bbs2, /* A */
 /* B */      bcs,  lda,  lda,  nop,  ldy,  lda,  ldx, smb3,  clv,  lda,  tsx,  nop,  ldy,  lda,  ldx, bbs3, /* B */
 /* C */      cpy,  cmp,  nop,  nop,  cpy,  cmp,  dec, smb4,  iny,  cmp,  dex,  wai,  cpy,  cmp,  dec, bbs4, /* C */
-/* D */      bne,  cmp,  cmp,  nop,  nop,  cmp,  dec, smb5,  cld,  cmp,  phx,  dummy,  nop,  cmp,  dec, bbs5, /* D */
+/* D */      bne,  cmp,  cmp,  nop,  nop,  cmp,  dec, smb5,  cld,  cmp,  phx,  db6502,  nop,  cmp,  dec, bbs5, /* D */
 /* E */      cpx,  sbc,  nop,  nop,  cpx,  sbc,  inc, smb6,  inx,  sbc,  nop,  nop,  cpx,  sbc,  inc, bbs6, /* E */
 /* F */      beq,  sbc,  sbc,  nop,  nop,  sbc,  inc, smb7,  sed,  sbc,  plx,  nop,  nop,  sbc,  inc, bbs7  /* F */
 };
@@ -1129,6 +1138,7 @@ uint32 exec6502(uint32 tickcount) {
 
 		The system is changed so that now clockticks 6502 is reset every single time that exec is called.
 	*/
+	if(waiting6502) return tickcount;
     clockgoal6502 = tickcount;
     clockticks6502 = 0;
     while (clockticks6502 < clockgoal6502) {
@@ -1147,6 +1157,7 @@ uint32 exec6502(uint32 tickcount) {
 }
 
 uint32 step6502() {
+	if(waiting6502) return 1;
     opcode = read6502(pc++);
     status |= FLAG_CONSTANT;
 
