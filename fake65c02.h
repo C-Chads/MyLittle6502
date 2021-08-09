@@ -283,8 +283,9 @@ void reset6502() {
     x = 0;
     y = 0;
     sp = 0xFD;
-    status &= ~FLAG_DECIMAL;
-    status |= FLAG_CONSTANT | FLAG_INTERRUPT;
+    cleardecimal();
+    status |= FLAG_CONSTANT;
+    setinterrupt();
 }
 
 
@@ -1094,8 +1095,8 @@ static const uint32 ticktable[256] = {
 void nmi6502() {
     push_6502_16(pc);
     push_6502_8(status  & ~FLAG_BREAK);
-    status |= FLAG_INTERRUPT;
-    status &= ~FLAG_DECIMAL;
+    setinterrupt();
+    cleardecimal();
     pc = (ushort)read6502(0xFFFA) | ((ushort)read6502(0xFFFB) << 8);
     waiting6502 = 0;
 }
@@ -1110,8 +1111,8 @@ void irq6502() {
 	if ((status & FLAG_INTERRUPT) == 0) {
 		push_6502_16(pc);
 		push_6502_8(status & ~FLAG_BREAK);
-		status |= FLAG_INTERRUPT;
-		status &= ~FLAG_DECIMAL;
+		setinterrupt();
+		cleardecimal();
 		/*pc = mem_6502_read16(0xfffe);*/
 		pc = (ushort)read6502(0xFFFE) | ((ushort)read6502(0xFFFF) << 8);
 		waiting6502 = 0;
