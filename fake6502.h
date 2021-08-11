@@ -400,7 +400,7 @@ static void adc() {
     penaltyop = 1;
 #ifndef NES_CPU
     if (status & FLAG_DECIMAL) {
-        ushort AL, A, tmp2, result_dec;
+        ushort AL, A, result_dec;
         A = a;
         value = getvalue();
         result_dec = (ushort)A + value + (ushort)(status & FLAG_CARRY); /*dec*/
@@ -410,9 +410,10 @@ static void adc() {
         A = (A & 0xF0) + (value & 0xF0) + AL; /*SEQ2C OR SEQ 1C*/
         if(A & 0x80) setsign(); else clearsign(); /*SEQ 2E it says "bit 7"*/
         if(A >= 0xA0) A += 0x60; /*SEQ 1E*/
-        result = A;
+        result = A; /*1F*/
         if(A & 0xff80) setoverflow();else clearoverflow();
-
+        if(A >= 0x100) setcarry(); else clearcarry(); /*SEQ 1G*/
+		
         zerocalc(result_dec); /*Original nmos does zerocalc on the binary result.*/
     } else 
 #endif
@@ -791,7 +792,7 @@ static void sbc() {
     	if(AL & 0x8000)  AL =  ((AL - 0x06) & 0x0F) - 0x10; /*3b*/
     	A = (A & 0xF0) - (B & 0xF0) + AL; /*3c*/
     	if(A & 0x8000) A = A - 0x60; /*3d*/
-    	result = A;
+    	result = A; /*3e*/
     } else 
 #endif
     {
