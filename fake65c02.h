@@ -150,6 +150,7 @@ typedef unsigned long uint32;
 #else
 typedef unsigned int uint32;
 #endif
+
 #endif
 /*
 	when this is defined, undocumented opcodes are handled.
@@ -229,6 +230,13 @@ uint32 clockticks6502 = 0;
 uint32 clockgoal6502 = 0;
 ushort oldpc, ea, reladdr, value, result;
 uint8 opcode, oldstatus, waiting6502 = 0;
+void reset6502();
+void nmi6502();
+void irq6502();
+void irq6502();
+uint32 exec6502(uint32 tickcount);
+uint32 step6502();
+void hookexternal(void *funcptr);
 #else
 static ushort pc;
 static uint8 sp, a, x, y, status;
@@ -241,6 +249,8 @@ static uint8 opcode, oldstatus, waiting6502 = 0;
 /*externally supplied functions*/
 extern uint8 read6502(ushort address);
 extern void write6502(ushort address, uint8 value);
+
+#ifndef FAKE6502_INCLUDE
 
 /*a few general functions used by various other functions*/
 static void push_6502_16(ushort pushval) {
@@ -1177,8 +1187,12 @@ void hookexternal(void *funcptr) {
 }
 
 /*
-	Changes checked against 
+	Check all changes against
 	http://6502.org/tutorials/65c02opcodes.html
 	and 
 	https://github.com/commanderx16/x16-emulator
+
+	The commander X16 emulator has bugs, but it seems to be reasonably solid.
 */
+/*FAKE6502 INCLUDE*/
+#endif
