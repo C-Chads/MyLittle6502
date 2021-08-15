@@ -241,24 +241,24 @@ extern uint8 read6502(ushort address);
 extern void write6502(ushort address, uint8 value);
 
 /*a few general functions used by various other functions*/
-void push_6502_16(ushort pushval) {
+static void push_6502_16(ushort pushval) {
     write6502(BASE_STACK + sp, (pushval >> 8) & 0xFF);
     write6502(BASE_STACK + ((sp - 1) & 0xFF), pushval & 0xFF);
     sp -= 2;
 }
 
-void push_6502_8(uint8 pushval) {
+static void push_6502_8(uint8 pushval) {
     write6502(BASE_STACK + sp--, pushval);
 }
 
-ushort pull_6502_16() {
+static ushort pull_6502_16() {
     ushort temp16;
     temp16 = read6502(BASE_STACK + ((sp + 1) & 0xFF)) | ((ushort)read6502(BASE_STACK + ((sp + 2) & 0xFF)) << 8);
     sp += 2;
     return(temp16);
 }
 
-uint8 pull_6502_8() {
+static uint8 pull_6502_8() {
     return (read6502(BASE_STACK + ++sp));
 }
 
