@@ -8,6 +8,10 @@ The header files in this repository are in the public domain.
 
 The tests files are not! They are GPL'd instruction set exercisers.
 
+fake65c02.h incorporates CMOS support code from the codebase for the [Commander X16 Emulator](https://github.com/commanderx16/x16-emulator/tree/master/src/cpu) which is not a public domain repository, however the changes are relatively minor and fake6502.c is still marked as fully public domain.
+
+Since their Fake6502 code is still marked as public domain, I figured that it would be ok to incorporate those changes here.
+
 # CHANGELOG
 
 * Wrote decimal mode according to http://www.6502.org/tutorials/decimal_mode.html#A
