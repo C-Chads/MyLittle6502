@@ -1,6 +1,19 @@
+/* LICENSING NOTICE:
+
+	This file contains changes incorporated from the non public domain 
+	Commander X16 emulator.
+
+	However, the fake6502 code in their repository is still marked public domain!
+
+	If Michael Steil or Paul Robson (or others who worked on the fake6502 implementation
+	in the X16 repo) have any issues whatsoever with the public domain license in use here,
+
+	please get them to leave an issue.
+*/
+
 /* Fake65c02 CPU emulator core v1.4 ******************
  *Original Author:Mike Chambers (miker00lz@gmail.com)*
- *                                                   *
+ *  Author 2: Paul Robson                            *
  *New Author:David MHS Webster (github.com/gek169)   *
  *    Leave a star on github to show thanks for this *
  *        FULLY PUBLIC DOMAIN, CC0 CODE              *
