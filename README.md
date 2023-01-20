@@ -12,6 +12,8 @@ fake65c02.h incorporates CMOS support code from the codebase for the [Commander 
 
 Since their Fake6502 code is still marked as public domain, I figured that it would be ok to incorporate those changes here.
 
+I have a pending github issue on the commander x16 repository asking if they intended this or if I have to relicense under the BSD 2 clause.
+
 # CHANGELOG
 
 * Wrote decimal mode according to http://www.6502.org/tutorials/decimal_mode.html#A
